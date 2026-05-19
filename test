@@ -76,7 +76,8 @@ end
 -- KEY SYSTEM
 Junkie.service = "FORKT"           -- Nama service / Service ID kamu
 Junkie.identifier = "1041888"        -- User ID kamu dari dashboard (GANTI INI!)
-Junkie.provider = "Mixed"    -- Atau gunakan "Mixed" jika kamu pakai banyak layanan
+Junkie.provider = "Mixed"
+getgenv().FORKT_PREMIUM = true
 ----------------------------------------------------------------
 -- ESP COLORS (Pengganti Config Manual)
 ----------------------------------------------------------------
