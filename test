@@ -3,7 +3,6 @@
     VERSION: v1.0.8 (God-Tier Mobile Edition)
     CREDITS: @sukitovone
 ]]
-
 if not game:IsLoaded() then game.Loaded:Wait() end
 while not game:GetService("Players").LocalPlayer do task.wait() end
 while not workspace.CurrentCamera do task.wait() end
@@ -50,6 +49,7 @@ if not WindUI then
 else
     print("WindUI berhasil dimuat")
 end
+local successJunkie, JunkieLib = pcall(function()
 
 ----------------------------------------------------------------
 -- ESP COLORS (Pengganti Config Manual)
@@ -2103,9 +2103,9 @@ local Window = WindUI:CreateWindow({
         SaveKey = true, 
         
         KeyValidator = function(key)
-    getgenv().FORKT_PREMIUM = true
+    getgenv().FORKT_PREMIUM = true   -- يجعل السكربت يظن أنك VIP
     getgenv().SCRIPT_KEY = key or "Free"
-    return true
+    return true                      -- قبول أي مفتاح تدخله
 end 
                 
                 -- Eksekusi Webhook Public-Safe di background
