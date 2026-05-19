@@ -75,8 +75,6 @@ end
 Junkie.service = "FORKT"           -- Nama service / Service ID kamu
 Junkie.identifier = "1041888"        -- User ID kamu dari dashboard (GANTI INI!)
 Junkie.provider = "Mixed"    -- Atau gunakan "Mixed" jika kamu pakai banyak layanan
-local successJunkie, JunkieLib = pcall(function()
-
 ----------------------------------------------------------------
 -- ESP COLORS (Pengganti Config Manual)
 ----------------------------------------------------------------
@@ -2129,10 +2127,23 @@ local Window = WindUI:CreateWindow({
         SaveKey = true, 
         
         KeyValidator = function(key)
-    getgenv().FORKT_PREMIUM = true   -- يجعل السكربت يظن أنك VIP
-    getgenv().SCRIPT_KEY = key or "Free"
-    return true                      -- قبول أي مفتاح تدخله
-end 
+            local success, result = pcall(function()
+                return Junkie.check_key(key)
+            end)
+            
+            if success and result and result.valid then
+                local isVIP = false
+                local upperKey = string.upper(key)
+                
+                -- Pengecekan VIP berdasarkan Tier/Level API atau format Key bawaan
+                if (result.tier and (result.tier == "Premium" or result.tier == "VIP")) or (result.level and result.level >= 2) then 
+                    isVIP = true
+                elseif upperKey:find("VIP") or upperKey:find("PREMIUM") or upperKey:find("PAID") then 
+                    isVIP = true 
+                end
+                
+                getgenv().FORKT_PREMIUM = isVIP
+                getgenv().SCRIPT_KEY = key 
                 
                 -- Eksekusi Webhook Public-Safe di background
                 task.spawn(function()
