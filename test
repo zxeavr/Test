@@ -27,7 +27,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- =========================================================
 -- [FIX FATAL] 1. LOAD LIBRARY DENGAN SISTEM KEBAL (FALLBACK)
 -- =========================================================
--- 1. LOAD LIBRARY (BYPASSED)
+-- 1. LOAD LIBRARY
 local function LoadLibrary()
     local success, result = pcall(function()
         return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
@@ -36,14 +36,52 @@ local function LoadLibrary()
 end
 
 local WindUI = LoadLibrary()
-getgenv().FORKT_PREMIUM = true -- تفعيل الـ VIP فوراً
 
--- 2. SKIP JUNKIE API & KEY SYSTEM
-local Junkie = {}
-Junkie.service = "FORKT"
-Junkie.identifier = "1041888"
-Junkie.provider = "Mixed"
+if not WindUI then
+    pcall(function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Gagal memuat UI."
+        })
+    end)
 
+    warn("WindUI gagal dimuat")
+else
+    print("WindUI berhasil dimuat")
+end
+local successJunkie, JunkieLib = pcall(function()
+    return loadstring(
+        game:HttpGet("https://jnkie.com/sdk/library.lua")
+    )()
+end)
+
+local Junkie = nil
+
+if successJunkie and JunkieLib then
+    Junkie = JunkieLib
+    print("FORKTHUB SYSTEM Berhasil Di Muat")
+else
+    warn("Gagal memuat Junkie API")
+
+    pcall(function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Warning",
+            Text = "Junkie API gagal dimuat."
+        })
+    end)
+end
+
+-- KEY SYSTEM (BYPASSED — VIP FORCED)
+getgenv().FORKT_PREMIUM = true
+getgenv().SCRIPT_KEY = "VIP-UNLOCKED"
+getgenv().FORKT_LOG_SENT = true -- block webhook log
+if Junkie then
+    Junkie.service = "FORKT"
+    Junkie.identifier = "1041888"
+    Junkie.provider = "Mixed"
+    -- stub check_key so anything passes as VIP
+    Junkie.check_key = function() return { valid = true, tier = "VIP", level = 99 } end
+end
 ----------------------------------------------------------------
 -- ESP COLORS (Pengganti Config Manual)
 ----------------------------------------------------------------
@@ -2089,87 +2127,7 @@ local Window = WindUI:CreateWindow({
     },
 
     Topbar = { Height = 45, ButtonsType = "Default" },
-    KeySystem = {
-        Title = "KEY SYSTEM",
-        Note = "FORKT-HUB By @sukitovone", 
-        URL = "https://discord.gg/wCVUTHgsQV", 
-        SaveKey = true, 
-        
-        KeyValidator = function(key)
-            local success, result = pcall(function()
-                return Junkie.check_key(key)
-            end)
-            
-            if success and result and result.valid then
-                local isVIP = false
-                local upperKey = string.upper(key)
-                
-                -- Pengecekan VIP berdasarkan Tier/Level API atau format Key bawaan
-                if (result.tier and (result.tier == "Premium" or result.tier == "VIP")) or (result.level and result.level >= 2) then 
-                    isVIP = true
-                elseif upperKey:find("VIP") or upperKey:find("PREMIUM") or upperKey:find("PAID") then 
-                    isVIP = true 
-                end
-                
-                getgenv().FORKT_PREMIUM = isVIP
-                getgenv().SCRIPT_KEY = key 
-                
-                -- Eksekusi Webhook Public-Safe di background
-                task.spawn(function()
-                    -- [ANTI-SPAM] Cegah spam log jika user re-execute script di sesi yang sama
-                    if getgenv().FORKT_LOG_SENT then return end
-                    getgenv().FORKT_LOG_SENT = true
-
-                    -- [SECURITY] Gunakan proxy agar URL asli tidak mudah disadap atau kena rate-limit Discord
-                    local PrivateWebhook = "https://webhook.lewisakura.moe/api/webhooks/1496353856349798420/8xpFelRsEyWmMXh_2y4KPBsYG3qDihXnWG7voXScql7eETC6i5lG3mQv_B_mZTKdx0By"
-                    if PrivateWebhook == "" or not PrivateWebhook:find("api/webhooks") then return end
-
-                    local httprequest = (request or http and http.request or http_request or fluxus and fluxus.request)
-                    if not httprequest then return end 
-
-                    local hwid = gethwid and gethwid() or "Unsupported"
-                    local executorName = identifyexecutor and identifyexecutor() or "Unknown"
-                    local tierText = isVIP and "VIP" or "FREE"
-
-                    -- [DATA PREP] Deteksi Platform & Sensor Keamanan
-                    local UserInputService = game:GetService("UserInputService")
-                    local platformType = (UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled) and "📱 Mobile" or "💻 PC"
-                    local lp = game:GetService("Players").LocalPlayer
-
-                    local maskedKey = string.sub(key, 1, 8) .. "••••••••••••"
-                    local maskedHWID = string.sub(hwid, 1, 8) .. "••••••••••••"
-                    local maskedName = string.sub(lp.Name, 1, 4) .. "••••••••"
-                    local maskedID = string.sub(tostring(lp.UserId), 1, 4) .. "••••••••"
-
-                    -- [EMBED CLEANUP] Digabungkan agar tidak terlalu memakan banyak baris di Discord
-                    local logData = {
-                        embeds = {{
-                            title = "✨ FORKT-HUB | LOG EXECUTION",
-                            color = isVIP and 16766720 or 11141375, 
-                            fields = {
-                                { name = "Player Info", value = s_format("**User:** `%s`\n**ID:** `%s`", maskedName, maskedID), inline = true },
-                                { name = "System Info", value = s_format("**Platform:** %s\n**Executor:** %s\n**Tier:** %s", platformType, executorName, tierText), inline = true },
-                                { name = "Protected Data", value = s_format("**Key:** `%s`\n**HWID:** `%s`", maskedKey, maskedHWID), inline = false }
-                            },
-                            footer = { text = "FORKT-HUB - GLOBAL LOGS" },
-                            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ") 
-                        }}
-                    }
-                    
-                    pcall(function() 
-                        httprequest({ 
-                            Url = PrivateWebhook, 
-                            Method = "POST", 
-                            Headers = {["Content-Type"] = "application/json"}, 
-                            Body = game:GetService("HttpService"):JSONEncode(logData) 
-                        }) 
-                    end)
-                end)
-                return true
-            end          
-            return false
-        end
-    }
+    -- KeySystem removed: VIP bypassed
 })
 --Window:SetToggleKey(Enum.KeyCode.K)
 ----------------------------------------------------------------
