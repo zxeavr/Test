@@ -51,33 +51,7 @@ if not WindUI then
 else
     print("WindUI berhasil dimuat")
 end
-local successJunkie, JunkieLib = pcall(function()
-    return loadstring(
-        game:HttpGet("https://jnkie.com/sdk/library.lua")
-    )()
-end)
 
-local Junkie = nil
-
-if successJunkie and JunkieLib then
-    Junkie = JunkieLib
-    print("FORKTHUB SYSTEM Berhasil Di Muat")
-else
-    warn("Gagal memuat Junkie API")
-
-    pcall(function()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Warning",
-            Text = "Junkie API gagal dimuat."
-        })
-    end)
-end
-
--- KEY SYSTEM
-Junkie.service = "FORKT"           -- Nama service / Service ID kamu
-Junkie.identifier = "1041888"        -- User ID kamu dari dashboard (GANTI INI!)
-Junkie.provider = "Mixed"
-getgenv().FORKT_PREMIUM = true
 ----------------------------------------------------------------
 -- ESP COLORS (Pengganti Config Manual)
 ----------------------------------------------------------------
