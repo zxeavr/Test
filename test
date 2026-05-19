@@ -3,6 +3,8 @@
     VERSION: v1.0.8 (God-Tier Mobile Edition)
     CREDITS: @sukitovone
 ]]
+getgenv().FORKT_PREMIUM = true
+
 if not game:IsLoaded() then game.Loaded:Wait() end
 while not game:GetService("Players").LocalPlayer do task.wait() end
 while not workspace.CurrentCamera do task.wait() end
