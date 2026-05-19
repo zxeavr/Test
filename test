@@ -27,7 +27,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- =========================================================
 -- [FIX FATAL] 1. LOAD LIBRARY DENGAN SISTEM KEBAL (FALLBACK)
 -- =========================================================
--- 1. LOAD LIBRARY
+-- 1. LOAD LIBRARY (BYPASSED)
 local function LoadLibrary()
     local success, result = pcall(function()
         return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
@@ -36,21 +36,9 @@ local function LoadLibrary()
 end
 
 local WindUI = LoadLibrary()
+getgenv().FORKT_PREMIUM = true -- تفعيل الـ VIP فوراً
 
-if not WindUI then
-    pcall(function()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Error",
-            Text = "Gagal memuat UI."
-        })
-    end)
-
-    warn("WindUI gagal dimuat")
-else
-    print("WindUI berhasil dimuat")
-end
--- تم فتح الـ VIP وإلغاء نظام المفتاح بنجاح 🎉
-getgenv().FORKT_PREMIUM = true
+-- 2. SKIP JUNKIE API & KEY SYSTEM
 local Junkie = {}
 Junkie.service = "FORKT"
 Junkie.identifier = "1041888"
